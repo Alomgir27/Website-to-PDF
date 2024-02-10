@@ -9,6 +9,8 @@ router.get('/website-to-pdf', async (req, res) => {
   const pdfSize = req.query.pdfSize || 'portrait' || 'landscape';
   const pageSize = req.query.pageSize || 'nomargin' || 'smallmargin' || 'bigmargin';
 
+  console.log('all query params', req.query);
+
  
   if (!url) {
     return res.render('website-to-pdf', { error: 'Please provide a URL to convert.' });
@@ -17,13 +19,15 @@ router.get('/website-to-pdf', async (req, res) => {
   try {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
+    
 
     const viewportSizes = {
-      'mobile': { width: 375, height: 667 },
+      'mobile': { width: 375, height: 812 },
       'tablet': { width: 768, height: 1024 },
-      'desktop': { width: 1440, height: 900 },
-      'desktopHD': { width: 1920, height: 1080 },
-      'laptop': { width: 1300, height: 768 },
+      'desktop': { width: 1440, height: 1600 },
+      'desktopHD': { width: 1920, height: 2048 },
+      'laptop': { width: 1300, height: 1400 },
+      'A4': { width: parseInt(8.27 * 96), height: parseInt(11.69 * 96) },
     };
 
     const selectedViewport = viewportSizes[screenSize] || viewportSizes['desktop'];
@@ -51,21 +55,9 @@ router.get('/website-to-pdf', async (req, res) => {
     const filename = path.basename(url).replace(/\./g, '-');
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=${filename}.pdf`);
+    res.setHeader('Content-Disposition', `attachment; filename=${filename + '-' + screenSize + '-' + pdfSize + '-' + pageSize}.pdf`);
 
-   
-
-    const pdfSizes = {
-      'portrait': { 
-        width: viewportSizes[screenSize].width,
-        height: viewportSizes[screenSize].height,
-      },
-      'landscape': { 
-        width: viewportSizes[screenSize].height,
-        height: viewportSizes[screenSize].width,
-      },
-    };
-    
+  
 
     const pageSizes = {
       'nomargin': { margin: { top: '0px', bottom: '0px', left: '0px', right: '0px' } },
@@ -75,6 +67,8 @@ router.get('/website-to-pdf', async (req, res) => {
 
   
     const pdfOptions = {
+      width: viewportSizes[screenSize].width,
+      height: viewportSizes[screenSize].height,
       margin: {
         top: '20px',
         bottom: '20px',
@@ -82,10 +76,10 @@ router.get('/website-to-pdf', async (req, res) => {
         right: '20px',
       },
       printBackground: true,
-      ...pdfSizes[pdfSize],
+      landscape: pdfSize === 'landscape',
       ...pageSizes[pageSize],
     };
-      
+    console.log(pdfOptions);
 
     const pdfBuffer = await page.pdf(pdfOptions);
 
@@ -97,5 +91,9 @@ router.get('/website-to-pdf', async (req, res) => {
     res.status(500).send('An error occurred while converting the webpage to PDF.');
   }
 });
+
+
+
+
 
 module.exports = router;

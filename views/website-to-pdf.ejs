@@ -95,7 +95,7 @@
                     <div class="col-md-12">
                         <h3 style="text-align: center">Convert a website to PDF format online for free.</h3>
                         <div class="well well-sm" style="padding-top: 30px;">
-                            <form id="webpageToPdfForm" action="/website-to-pdf" method="get">
+                            <!-- <form id="webpageToPdfForm" action="/website-to-pdf" method="get"> -->
                                 <div style="width: 30%; min-width: 330px; margin: 0 auto;">
                                     <div id="urlInputSection" style="text-align: center; border: 3px solid; border-radius: 6px; padding: 10px;">
                                         <label for="url">Enter URL:</label>
@@ -111,7 +111,10 @@
                                     <div id="websiteViewer" style="text-align: center; padding: 60px 20px; display: none;">
                                         <div id="htmlPreviewSection" style="float: left; width: 62%; overflow-y: auto; background-color: #ffffff; padding: 25px; display: none;">
                                             <!-- Preview of the website -->
-                                            <iframe id="htmlPreview" style="width: 100%; height: 700px;"></iframe>
+                                            <!-- <iframe id="htmlPreview" style="width: 100%; height: 700px;"></iframe> -->
+                                            <embed id="htmlPreview" type="application/pdf" width="100%" height="700px" />
+                                            <p id="loading" style="display: none; text-align: center; padding-top: 20px;"></p>
+
                                         </div>
                                     
                                     <!-- Area on right side of the PDF canvas -->
@@ -129,11 +132,12 @@
                                             <div class="tablinks">
                                                 <label for="screenSize" style="font-weight: 500; display: block; margin-bottom: 5px;">Screen Size:</label>
                                                 <select id="screenSize" name="screenSize" style="font-size: 30px;">
-                                                    <option value="mobile">Mobile (320px)</option>
+                                                    <option value="mobile">Mobile (375px)</option> <!-- Added onclick event -->
                                                     <option value="tablet">Tablet (768px)</option>
                                                     <option value="desktop">Desktop (1440p)</option>
                                                     <option value="desktopHD">Desktop (1920px)</option>
                                                     <option value="laptop">Laptop (1300px)</option>
+                                                    <option value="A4">A4 (8.27 x 11.7 inches)</option>
                                                 </select>
                                             </div>
                                                                                  
@@ -154,6 +158,14 @@
                                                 </select>
                                             </div>
                                         </div>
+                               <!-- for see preview button -->
+                               <div onclick="addHtml()" style="text-align: center; padding-top: 20px;">
+                                    <div
+                                     style="background-color: #4955c3; color: white; font-size: 25px; font-weight: 500; padding: 14px 16px; border-radius: 8px; cursor: pointer; width: 100%;"
+                                     type="button"
+
+                                     >See Preview</div>
+                                </div>
                                     
                                 <div id="convertButtonSection" style="text-align: center; padding-top: 20px; display: none;">
                                     <!-- Display the "Convert to PDF" button -->
@@ -163,7 +175,7 @@
                                 </div>
                                 </div>
                                 </div>
-                            </form>
+                            <!-- </form> -->
                         </div>
                     </div>
                 </div>
@@ -195,9 +207,31 @@
 
         // Get the URL input value
         const url = document.getElementById('url').value;
+        
 
         // Set the iframe source to the entered URL
-        document.getElementById('htmlPreview').src = url;
+        // document.getElementById('htmlPreview').src = url;
+
+        let screenSize = document.getElementById('screenSize').value;
+        let pdfSize = document.getElementById('pdfSize').value;
+        let pageSize = document.getElementById('pageSize').value;
+
+        console.log(screenSize, pdfSize, pageSize);
+
+        //add login to the website  
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('loading').innerHTML = 'Loading...';
+
+
+        fetch(`/website-to-pdf?url=${url}&screenSize=${screenSize}&pdfSize=${pdfSize}&pageSize=${pageSize}`)
+            .then(response => response.blob())
+            .then(blob => {
+                const file = new Blob([blob], { type: 'application/pdf' });
+                const fileURL = URL.createObjectURL(file);
+                document.getElementById('htmlPreview').src = fileURL;
+                document.getElementById('loading').style.display = 'none';
+            })
 
         // Set the entered URL in the Website URL sidebar
         sidebarUrlInput.value = url; // Added this line
