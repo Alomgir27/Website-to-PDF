@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Website to PDF Converter</title>
+    <%- include('includes/header.ejs') %>
+    <style>
+        #websiteOptions {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        border: 1px solid rgb(221, 221, 221);
+        }
+
+        #htmlPreviewSection {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        border: 1px solid rgb(221, 221, 221);
+        }
+    
+        .tablinks {      
+        background: #f4f5f9;
+        padding: 14px 16px;
+        display: block;
+        width: 100%;
+        margin-top: 12px;
+        border: 1px solid #9bb8da;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px 0 rgba(0,0,0,.14); 
+        }
+    
+        .tablinks button:hover {
+        background-color: #ddd;
+        }
+    
+        .convert-btn {
+        background-color: #FF0000;
+        color: white;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 14px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        }
+    
+        .convert-btn:hover {
+        background-color: #2c3e50 !important;
+        }
+    
+        @media (max-width: 1225px) {
+
+        h2 {
+            font-size: 25px !important;
+        }
+    }
+    
+        @media (max-width: 1000px) {
+        #websiteOptions {
+            float: none !important;
+            width: 100% !important;
+            margin-top: 20px;
+        }
+
+        #htmlPreviewSection {
+            float: none !important;
+            width: 100% !important;
+            margin-top: 20px;
+        }
+    
+        #websiteViewer {
+            padding: 20px 10px; /* Adjust padding for smaller screens */
+        }
+    
+        .tablinks {
+            padding: 10px 16px; /* Decrease padding for smaller screens */
+            margin-top: 8px;
+        }
+    
+        .convert-btn {
+            font-size: 15px !important;
+            padding: 20px 16px !important;
+        }
+    }
+        </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<section style="background: white; padding: 50px;" id="hero" class="hero">
+    <div class="container position-relative">
+        <div class="row gy-5">
+            <div class="col-lg-12 order-2 order-lg-1 d-flex flex-column">
+                <h1 style="text-align: center">Website to PDF Converter</h1>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 style="text-align: center">Convert a website to PDF format online for free.</h3>
+                        <div class="well well-sm" style="padding-top: 30px;">
+                            <form id="webpageToPdfForm" action="/website-to-pdf" method="get">
+                                <div style="width: 30%; min-width: 330px; margin: 0 auto;">
+                                    <div id="urlInputSection" style="text-align: center; border: 3px solid; border-radius: 6px; padding: 10px;">
+                                        <label for="url">Enter URL:</label>
+                                        <br>
+                                        <input type="text" name="url" id="url" placeholder="https://pdfeditor.ca" required>
+                                    </div>
+                                </div>
+                                <div style="text-align: center; padding-top: 40px;">
+                                    <label class="btn-upload" id="addHtmlBtn" onclick="addHtml()">
+                                        Create PDF
+                                </div>
+                                <div class="row" style="background: #f5f5fa;">
+                                    <div id="websiteViewer" style="text-align: center; padding: 60px 20px; display: none;">
+                                        <div id="htmlPreviewSection" style="float: left; width: 62%; overflow-y: auto; background-color: #ffffff; padding: 25px; display: none;">
+                                            <!-- Preview of the website -->
+                                            <iframe id="htmlPreview" style="width: 100%; height: 700px;"></iframe>
+                                        </div>
+                                    
+                                    <!-- Area on right side of the PDF canvas -->
+                                    <div id="websiteOptions" style="float: right; width: 33%; overflow-y: auto; background-color: #ffffff; padding: 25px; display: none;">
+                                    <h2 style="text-align: center; font-size: 30px;">Website to PDF</h2>
+                                    <hr style="clear: both; border-top: 2px solid #000; padding-bottom: 20px;">
+                                    
+                                        <div id="pdfOptions" style="text-align: center; padding-bottom: 20px;">
+
+                                            <div class="tablinks">
+                                                <label for="websitename" style="font-weight: 500; display: block; margin-bottom: 5px;">Website URL:</label>
+                                                <input type="text" id="sidebarUrl" style="border: 1px solid; border-radius: 6px; padding: 3px; text-align: center; width: 100%;" readonly>
+                                            </div>
+
+                                            <div class="tablinks">
+                                                <label for="screenSize" style="font-weight: 500; display: block; margin-bottom: 5px;">Screen Size:</label>
+                                                <select id="screenSize" name="screenSize" style="font-size: 30px;">
+                                                    <option value="mobile">Mobile (320px)</option>
+                                                    <option value="tablet">Tablet (768px)</option>
+                                                    <option value="desktop">Desktop (1440p)</option>
+                                                    <option value="desktopHD">Desktop (1920px)</option>
+                                                    <option value="laptop">Laptop (1300px)</option>
+                                                </select>
+                                            </div>
+                                                                                 
+                                            <div class="tablinks">
+                                                <label for="pdfSize" style="font-weight: 500; display: block; margin-bottom: 5px;">Orientation:</label>
+                                                <select id="pdfSize" name="pdfSize" style="font-size: 30px;">
+                                                    <option value="portrait">Portrait</option>
+                                                    <option value="landscape">Landscape</option>
+                                                </select>
+                                            </div>
+                                        
+                                            <div class="tablinks">
+                                                <label for="pageSize" style="font-weight: 500; display: block; margin-bottom: 5px;">Page Margin:</label>
+                                                <select id="pageSize" name="pageSize" style="font-size: 30px;">
+                                                    <option value="nomargin">No Margin</option>
+                                                    <option value="smallmargin">Small Margin</option>
+                                                    <option value="bigmargin">Big Margin</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    
+                                <div id="convertButtonSection" style="text-align: center; padding-top: 20px; display: none;">
+                                    <!-- Display the "Convert to PDF" button -->
+                                    <button class="convert-btn" type="submit">Convert to PDF</button>
+                                </div>
+
+                                </div>
+                                </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Hero Section -->
+
+<script>
+    function addHtml() {
+        const urlInputSection = document.getElementById('urlInputSection');
+        const htmlPreviewSection = document.getElementById('htmlPreviewSection');
+        const addHtmlBtn = document.getElementById('addHtmlBtn');
+        const websiteViewer = document.getElementById('websiteViewer');
+        const websiteOptions = document.getElementById('websiteOptions');
+        const convertButtonSection = document.getElementById('convertButtonSection');
+        const sidebarUrlInput = document.getElementById('sidebarUrl'); 
+
+        // Hide URL input and Add HTML button
+        urlInputSection.style.display = 'none';
+        addHtmlBtn.style.display = 'none';
+
+        // Display HTML preview and Screen Size options
+        htmlPreviewSection.style.display = 'block';
+        websiteViewer.style.display = 'block';
+        websiteOptions.style.display = 'block';
+        convertButtonSection.style.display = 'block';
+
+        // Get the URL input value
+        const url = document.getElementById('url').value;
+
+        // Set the iframe source to the entered URL
+        document.getElementById('htmlPreview').src = url;
+
+        // Set the entered URL in the Website URL sidebar
+        sidebarUrlInput.value = url; // Added this line
+    }
+</script>
+
+</body>
+</html>
